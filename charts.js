@@ -46,6 +46,11 @@ function makeMergedSegment(county, offset) {
             const i1 = ctx.p1DataIndex + offset;
             if (county.isMerged[i0] || county.isMerged[i1]) return midColor;
         },
+        borderWidth: ctx => {
+            const i0 = ctx.p0DataIndex + offset;
+            const i1 = ctx.p1DataIndex + offset;
+            if (county.isMerged[i0] || county.isMerged[i1]) return 4.5;
+        },
     };
 }
 
