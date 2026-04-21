@@ -203,18 +203,13 @@ body {
 }
 
 .selector-collapsible {
-    display: grid;
-    grid-template-rows: 1fr;
-    transition: grid-template-rows 0.22s ease;
     overflow: hidden;
+    max-height: 300px;
+    transition: max-height 0.25s ease;
 }
 
 .county-selector-bar.collapsed .selector-collapsible {
-    grid-template-rows: 0fr;
-}
-
-.selector-collapsible > .selector-inner {
-    min-height: 0;
+    max-height: 0;
 }
 
 .selector-inner {
