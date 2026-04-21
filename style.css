@@ -197,9 +197,10 @@ body {
     max-width: 1360px;
     margin: 0 auto;
     padding: 0.5rem 2rem;
-    display: flex;
+    display: flex !important;
     align-items: center;
     gap: 0.75rem;
+    flex-wrap: nowrap;
 }
 
 .selector-collapsible {
@@ -227,16 +228,18 @@ body {
     flex-shrink: 0;
     width: 28px;
     height: 28px;
+    min-width: 28px;
     padding: 5px;
     border: 1px solid var(--color-border);
     border-radius: 6px;
     background: transparent;
     color: var(--color-text-muted);
     cursor: pointer;
-    display: flex;
+    display: flex !important;
     align-items: center;
     justify-content: center;
     transition: background 0.15s, color 0.15s, transform 0.22s;
+    line-height: 0;
 }
 
 .selector-toggle-btn:hover {
