@@ -257,23 +257,7 @@ const RANKING_INDICATORS = [
     { id: 'kulturPerInnb', label: 'Kultur per innbygger', unit: 'kr', fmt: v => `${v.toLocaleString('nb-NO')} kr`, yearBased: true },
     { id: 'befolkningstetthet', label: 'Befolkningstetthet', unit: 'innb./km²', fmt: v => `${v.toLocaleString('nb-NO', {maximumFractionDigits:1})} innb./km²`, yearBased: false },
     { id: 'fylkesveiPer1000', label: 'Fylkesvei per 1 000 innb.', unit: 'km', fmt: v => `${v.toFixed(1)} km`, yearBased: false },
-    {
-        id: 'befolkningsvekst5y',
-        label: 'Befolkningsvekst siste 5 år',
-        unit: '%',
-        fmt: v => `${v >= 0 ? '+' : ''}${v.toFixed(1)} %`,
-        yearBased: false,
-        higherBetter: true,
-        yearLabel: `${YEARS[YEARS.length - 6]}–${YEARS[YEARS.length - 1]}`,
-        getValue: id => {
-            const c = COUNTIES[id];
-            if (!c) return null;
-            const last = c.befolkning[YEARS.length - 1];
-            const fiveBack = c.befolkning[YEARS.length - 6];
-            if (last == null || fiveBack == null || fiveBack === 0) return null;
-            return ((last - fiveBack) / fiveBack) * 100;
-        },
-    },
+    { id: 'befolkningsvekst5y', label: 'Befolkningsvekst siste 5 år', unit: '%', fmt: v => `${v >= 0 ? '+' : ''}${v.toFixed(1)} %`, yearBased: false, higherBetter: true, yearLabel: '2020–2025' },
     {
         id: 'vgsGjennomforing',
         label: 'VGS fullført og bestått',

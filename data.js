@@ -335,6 +335,10 @@ function getStructuralMetrics(countyId) {
     const c = COUNTIES[countyId];
     if (!s || !c) return null;
     const pop2025 = c.befolkning[c.befolkning.length - 1];
+    const pop5Back = c.befolkning[c.befolkning.length - 6];
+    const vekst5y = (pop2025 != null && pop5Back != null && pop5Back > 0)
+        ? (pop2025 - pop5Back) / pop5Back * 100
+        : null;
     return {
         areal: s.areal,
         befolkningstetthet: Math.round(pop2025 / s.areal * 10) / 10,
@@ -343,6 +347,7 @@ function getStructuralMetrics(countyId) {
         bruer: s.bruer,
         tunnelerKm: s.tunnelerKm,
         fergesamband: s.fergesamband,
+        befolkningsvekst5y: vekst5y,
     };
 }
 
