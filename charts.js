@@ -824,6 +824,7 @@ function clearAllCounties() {
     updateTable();
     updateOsloBadges();
     updateRanking();
+    updateSelectorSummary();
 }
 
 // Override toggleCounty to also update chips (allows 0 selected)
@@ -840,6 +841,7 @@ toggleCounty = function(id) {
     updateTable();
     updateOsloBadges();
     updateRanking();
+    updateSelectorSummary();
 };
 
 // ══════════════════════════════════════
@@ -915,6 +917,29 @@ function updateRanking() {
 }
 
 // ══════════════════════════════════════
+// COLLAPSIBLE SELECTOR BAR
+// ══════════════════════════════════════
+function updateSelectorSummary() {
+    const el = document.getElementById('selector-collapsed-summary');
+    if (!el) return;
+    const selected = getSelectedCounties();
+    if (selected.length === 0) {
+        el.textContent = 'Ingen fylker valgt';
+    } else if (selected.length <= 3) {
+        el.textContent = selected.map(c => c.name).join(', ');
+    } else {
+        el.textContent = `${selected.length} fylker valgt`;
+    }
+}
+
+function toggleSelector() {
+    const bar = document.getElementById('county-selector-bar');
+    const isCollapsed = bar.classList.toggle('collapsed');
+    localStorage.setItem('selectorCollapsed', isCollapsed);
+    updateSelectorSummary();
+}
+
+// ══════════════════════════════════════
 // EXPAND / SWAP CARD
 // ══════════════════════════════════════
 function expandCard(card) {
@@ -953,3 +978,9 @@ updateOsloBadges();
 updateRanking();
 updateFetchUI();
 initExpandButtons();
+
+// Restore collapsed state from previous visit
+if (localStorage.getItem('selectorCollapsed') === 'true') {
+    document.getElementById('county-selector-bar')?.classList.add('collapsed');
+}
+updateSelectorSummary();
