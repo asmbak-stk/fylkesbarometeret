@@ -750,6 +750,7 @@ body {
 .card-body canvas {
     width: 100% !important;
     max-height: 280px;
+    min-height: 160px;
 }
 
 .card-wide .card-body canvas {
