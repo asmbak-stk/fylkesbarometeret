@@ -335,9 +335,9 @@ function getStructuralMetrics(countyId) {
     const c = COUNTIES[countyId];
     if (!s || !c) return null;
     const pop2025 = c.befolkning[c.befolkning.length - 1];
-    const pop5Back = c.befolkning[c.befolkning.length - 6];
-    const vekst5y = (pop2025 != null && pop5Back != null && pop5Back > 0)
-        ? (pop2025 - pop5Back) / pop5Back * 100
+    const pop2019 = c.befolkning[c.befolkning.length - 7]; // index 4 = 2019, siste år før sammenslåing
+    const vekst5y = (pop2025 != null && pop2019 != null && pop2019 > 0)
+        ? (pop2025 - pop2019) / pop2019 * 100
         : null;
     return {
         areal: s.areal,
