@@ -688,6 +688,19 @@ body {
     position: relative;
 }
 
+.chart-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #94a3b8;
+    pointer-events: none;
+    letter-spacing: 0.01em;
+}
+
 .card-body-tall {
     min-height: 620px;
 }

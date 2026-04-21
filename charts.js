@@ -170,19 +170,19 @@ function updateAllCharts() {
     const counties = getSelectedCounties();
     if (counties.length === 0) {
         Object.keys(charts).forEach(k => destroyChart(k));
-        document.querySelectorAll('.card-body canvas').forEach(canvas => {
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.save();
-            ctx.fillStyle = '#94a3b8';
-            ctx.font = '500 13px Inter, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('Velg et fylke for å se data', canvas.width / 2, canvas.height / 2);
-            ctx.restore();
+        document.querySelectorAll('.card-body').forEach(body => {
+            // Remove old placeholder if present
+            body.querySelector('.chart-placeholder')?.remove();
+            // Add crisp HTML overlay
+            const ph = document.createElement('div');
+            ph.className = 'chart-placeholder';
+            ph.textContent = 'Velg et fylke for å se data';
+            body.appendChild(ph);
         });
         return;
     }
+    // Remove placeholders when counties are selected
+    document.querySelectorAll('.chart-placeholder').forEach(el => el.remove());
     const labels = getChartLabels();
 
     // --- Netto driftsresultat ---
