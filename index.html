@@ -21,7 +21,7 @@
             <div class="nav-links">
                 <a href="#" class="nav-link active">Dashboard</a>
                 <a href="#" class="nav-link" onclick="document.getElementById('modal-datagrunnlag').showModal();return false;">Datagrunnlag</a>
-                <a href="#" class="nav-link">Om</a>
+                <a href="#" class="nav-link" onclick="document.getElementById('modal-om').showModal();return false;">Om</a>
             </div>
         </div>
     </nav>
@@ -422,8 +422,41 @@
         </div>
     </dialog>
 
+    <!-- Om-modal -->
+    <dialog id="modal-om" class="data-modal">
+        <div class="modal-header">
+            <h2 class="modal-title">Om Fylkesbarometeret</h2>
+            <button class="modal-close" onclick="document.getElementById('modal-om').close()" aria-label="Lukk">✕</button>
+        </div>
+        <div class="modal-body">
+            <p>Denne siden er laget med <strong>Claude Code</strong> av <strong>Åsmund Bakkevig</strong>. Det er et hobbyprojekt som ble til for å undersøke hvordan man enkelt kunne aggregere og presentere data ved bruk av kunstig intelligens.</p>
+            <p>Dersom du har spørsmål, tilbakemeldinger, ros, ris eller annet, send meg gjerne en melding på <a id="om-email-link" href="#" class="om-email-link">[laster…]</a>.</p>
+            <div class="om-tech">
+                <h4>Teknisk</h4>
+                <ul>
+                    <li>Bygget med <a href="https://claude.ai/code" target="_blank">Claude Code</a> (Anthropic)</li>
+                    <li>Data fra SSB via JSON-stat2 API</li>
+                    <li>Chart.js 4.4.7 for visualisering</li>
+                    <li>Ingen server — kjører helt i nettleseren</li>
+                    <li>Kildekode: <a href="https://github.com/asmbak-stk/fylkesbarometeret" target="_blank">github.com/asmbak-stk/fylkesbarometeret</a></li>
+                </ul>
+            </div>
+        </div>
+    </dialog>
+
     <script src="data.js"></script>
     <script src="api.js"></script>
     <script src="charts.js"></script>
+    <script>
+        // E-post obfuskert som char-koder — aldri lesbar som klartekst i HTML-kildekoden
+        (function () {
+            const link = document.getElementById('om-email-link');
+            if (!link) return;
+            const e = [97,115,109,117,110,100,46,98,97,107,107,101,118,105,103,46,115,104,111,112,112,105,110,103,64,103,109,97,105,108,46,99,111,109]
+                .map(c => String.fromCharCode(c)).join('');
+            link.href = 'mailto:' + e;
+            link.textContent = e;
+        })();
+    </script>
 </body>
 </html>

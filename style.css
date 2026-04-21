@@ -901,6 +901,48 @@ body {
     vertical-align: top;
 }
 .source-table tr:hover td { background: #fafbfc; }
+/* === Om-modal === */
+.modal-body p {
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: #374151;
+    margin-bottom: 0.85rem;
+}
+
+.om-tech {
+    margin-top: 1.25rem;
+    padding: 1rem 1.25rem;
+    background: #f8f9fb;
+    border-radius: 8px;
+    border-left: 3px solid #e2e8f0;
+}
+
+.om-tech h4 {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #5f6b7a;
+    margin-bottom: 0.6rem;
+}
+
+.om-tech ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    font-size: 0.88rem;
+    line-height: 1.8;
+    color: #374151;
+}
+
+.om-tech a, .om-email-link {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.om-tech a:hover, .om-email-link:hover {
+    text-decoration: underline;
+}
+
 .modal-note {
     font-size: 12px;
     color: #5f6b7a;
