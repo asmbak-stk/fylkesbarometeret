@@ -253,10 +253,11 @@ body {
     color: var(--color-text-muted);
     font-style: italic;
     display: none;
+    flex: 1;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 55vw;
 }
 
 .county-selector-bar.collapsed .selector-collapsed-summary {
