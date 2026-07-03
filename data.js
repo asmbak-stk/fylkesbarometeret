@@ -424,6 +424,7 @@ let SSB_FETCHED_AT = null;
         for (const [field, yearMap] of Object.entries(fields)) {
             const guard = i =>
                 c.isMerged[i] ||                                        // behold sammenslått enhets tall
+                (field === 'befolkning' && !yearMap[YEARS[i]]) ||       // 0/null = region fantes ikke
                 (c.isOslo && OSLO_INCOMPARABLE.includes(field) && YEARS[i] < 2020); // Oslo-økonomi fra 2020
             setByYear(c[field], YEARS, yearMap, guard);
         }

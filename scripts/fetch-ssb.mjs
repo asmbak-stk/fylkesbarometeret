@@ -161,6 +161,7 @@ async function fetchBefolkning() {
     decodeJsonStat2(result, (coord, val) => {
         const id = ID_BY_2DIGIT[coord[regionVar.code]];
         if (!id) return;
+        if (val <= 0) return; // SSB gir 0 for år der regionen ikke eksisterte
         setCounty('counties', id, 'befolkning', parseInt(coord[tid.code]), val);
         n++;
     });
@@ -274,14 +275,27 @@ async function fetchAreal() {
     const regionVar = findVariable(meta, /^Region$/i);
     const contents = findVariable(meta, /^ContentsCode$/i);
     const tid = findVariable(meta, /^Tid$/i);
-    const landareal = findCode(contents, /^landareal$|landareal/i, 'Landareal');
     const lastYear = tid.values[tid.values.length - 1];
 
-    const result = await ssbPost('09280', [
+    // Landareal ligger i egen arealtype-dimensjon; ContentsCode er «Areal (km²)»
+    const arealtypeVar = meta.variables.find(v => /arealtype/i.test(v.code) || /arealtype/i.test(v.text));
+    const query = [
         { code: regionVar.code, selection: { filter: 'item', values: Object.values(FYLKE_2DIGIT) } },
-        { code: contents.code, selection: { filter: 'item', values: [landareal.code] } },
         { code: tid.code, selection: { filter: 'item', values: [lastYear] } },
-    ]);
+    ];
+    if (arealtypeVar) {
+        const landareal = findCode(arealtypeVar, /^landareal$|landareal/i, 'Landareal');
+        if (!landareal) throw new Error('09280: fant ikke landareal-kode i arealtype');
+        query.push({ code: arealtypeVar.code, selection: { filter: 'item', values: [landareal.code] } });
+    }
+    if (contents.values.length === 1) {
+        query.push({ code: contents.code, selection: { filter: 'item', values: [contents.values[0]] } });
+    } else {
+        const areal = findCode(contents, /areal/i, 'Areal');
+        if (!areal) throw new Error('09280: fant ikke areal-innholdskode');
+        query.push({ code: contents.code, selection: { filter: 'item', values: [areal.code] } });
+    }
+    const result = await ssbPost('09280', query);
     let n = 0;
     decodeJsonStat2(result, (coord, val) => {
         const id = ID_BY_2DIGIT[coord[regionVar.code]];
@@ -301,7 +315,7 @@ async function fetchVei() {
     const tid = findVariable(meta, /^Tid$/i);
 
     const fieldSpecs = [
-        ['fylkesveiKm', /^fylkesvei(er)?[ ,.]|fylkesvei.*\bkm\b|lengde.*fylkesvei/i, 'structuralLatest'],
+        // fylkesveiKm: riktig innholdskode bekreftes via --probe før mapping aktiveres
         ['darligDekke', /dårlig.*dekke/i, 'roadQuality'],
     ];
     const codeToSpec = {};
@@ -343,8 +357,8 @@ async function fetchTannhelseDekning() {
     const contents = findVariable(meta, /^ContentsCode$/i);
     const tid = findVariable(meta, /^Tid$/i);
 
-    // Andel barn/unge undersøkt — prøv flere formuleringer
-    const andel = findCode(contents, /andel.*undersøkt|undersøkt.*andel|undersøkt\/behandlet/i, 'Andel undersøkt');
+    // Andel (prosent) undersøkt/behandlet — må matche «andel», ellers får vi antall
+    const andel = findCode(contents, /andel.*(undersøkt|behandlet)/i, 'Andel undersøkt');
     if (!andel) throw new Error('11961: fant ikke andel-undersøkt-kode');
 
     // Pasientgruppe-dimensjon (barn 3–18 år), hvis den finnes
@@ -441,7 +455,7 @@ async function probe() {
             console.log(`\n═══ ${t}: ${meta.title}`);
             for (const v of meta.variables) {
                 console.log(`  ${v.code} («${v.text}»), ${v.values.length} koder${v.elimination ? ' [kan utelates]' : ''}`);
-                const show = Math.min(v.values.length, 40);
+                const show = Math.min(v.values.length, 120);
                 for (let i = 0; i < show; i++) console.log(`      ${v.values[i]} = ${v.valueTexts[i]}`);
                 if (v.values.length > show) console.log(`      … og ${v.values.length - show} til`);
             }
