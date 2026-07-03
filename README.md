@@ -50,9 +50,16 @@ Statisk side (GitHub Pages) — ingen byggverktøy, ingen server. Laget med
   ikke på sammenlignbar skala).
 - **Oslo er både kommune og fylkeskommune.** Økonomiindikatorene omfatter hele
   Oslo kommune og er ikke direkte sammenlignbare med rene fylkeskommuner; de
-  merkes i UI-et. Sektorutgifter per innbygger (KOSTRA-funksjoner) er
-  sammenlignbare. Landssnitt-referanselinjen bruker SSBs aggregat «landet uten
-  Oslo» der det er tilgjengelig.
+  merkes i UI-et. Undersøkt (juli 2026): SSB-tabell 13561 har ingen egen
+  regionkode for fylkesdelen av Oslo (0300 = hele kommunen), så en reelt
+  sammenlignbar Oslo-økonomi er ikke tilgjengelig fra API-et. Sektorutgifter
+  per innbygger (KOSTRA-funksjoner i 12163) er derimot sammenlignbare.
+  Landssnitt-referanselinjene bruker SSBs aggregat «landet uten Oslo»
+  (EAFKUO) der det finnes, ellers beregnes de fra fylkessummene uten Oslo.
+- **VGS-gjennomføring (12971)** har ikke regionkoder for fylkene som ble
+  opprettet i 2024 — bare Oslo, Rogaland, Møre og Romsdal, Nordland og
+  Trøndelag kan hentes fra API-et. Tallene for øvrige fylker er innebygde
+  anslag som ikke kan verifiseres mot SSB per i dag.
 - **Sammenslåingsperioder 2020–2023**: Viken, Vestfold og Telemark samt Troms
   og Finnmark rapporteres som sammenslåtte enheter i disse årene (markert ★
   og dempet farge i grafene).

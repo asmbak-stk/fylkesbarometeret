@@ -122,6 +122,7 @@ const OUT = {
     generator: 'scripts/fetch-ssb.mjs',
     tables: {},        // tabellId → { title, ok, note }
     counties: {},      // countyId → felt → { år: verdi }
+    nationalPopulation: {}, // { år: verdi } — hele landet (til per-innb-beregninger)
     nationalAvg: {},   // felt → { år: verdi }  (landet uten Oslo der tilgjengelig)
     nationalAvgScope: null, // 'uten-oslo' | 'landet' | null
     structural: {},    // countyId → { areal, fylkesveiKm, ... }
@@ -153,16 +154,19 @@ async function fetchBefolkning() {
     const years = tid.values.filter(y => YEARS.includes(parseInt(y)));
 
     const result = await ssbPost('11342', [
-        { code: regionVar.code, selection: { filter: 'item', values: Object.values(FYLKE_2DIGIT) } },
+        { code: regionVar.code, selection: { filter: 'item', values: ['0', ...Object.values(FYLKE_2DIGIT)] } },
         { code: contents.code, selection: { filter: 'item', values: [folkemengde.code] } },
         { code: tid.code, selection: { filter: 'item', values: years } },
     ]);
     let n = 0;
     decodeJsonStat2(result, (coord, val) => {
-        const id = ID_BY_2DIGIT[coord[regionVar.code]];
-        if (!id) return;
         if (val <= 0) return; // SSB gir 0 for år der regionen ikke eksisterte
-        setCounty('counties', id, 'befolkning', parseInt(coord[tid.code]), val);
+        const regCode = coord[regionVar.code];
+        const year = parseInt(coord[tid.code]);
+        if (regCode === '0') { OUT.nationalPopulation[year] = val; return; }
+        const id = ID_BY_2DIGIT[regCode];
+        if (!id) return;
+        setCounty('counties', id, 'befolkning', year, val);
         n++;
     });
     OUT.tables['11342'].ok = true;
@@ -214,59 +218,92 @@ async function fetchSektorutgifter() {
 async function fetchOkonomi() {
     const meta = await ssbGet('13561');
     OUT.tables['13561'] = { title: meta.title, ok: false };
-    const regionVar = findVariable(meta, /region/i);
+    const regionVar = findVariable(meta, /fylkesregion|region/i);
+    const begrepVar = findVariable(meta, /artkap|regnskapsbegrep/i);
+    const omfangVar = findVariable(meta, /regnskapsomfa/i);
     const contents = findVariable(meta, /^ContentsCode$/i);
     const tid = findVariable(meta, /^Tid$/i);
 
-    // Feltmapping: match mot innholds-tekster i metadata
-    const fieldSpecs = [
-        ['nettoDriftsresultat', /netto driftsresultat.*prosent/i],
-        ['frieInntekterPerInnb', /frie inntekter.*per innbygg/i],
-        ['disposisjonsfond', /disposisjonsfond.*prosent/i],
-        ['nettoLanegjeldPerInnb', /netto lånegjeld.*per innbygg/i],
-        ['bruttoDriftsinntekter', /brutto driftsinntekter/i],
-        ['skatteinntekterPerInnb', /skatt på inntekt og formue.*per innbygg/i],
-    ];
-    const codeToField = {};
-    const wanted = [];
-    for (const [field, re] of fieldSpecs) {
-        const hit = findCode(contents, re, field);
-        if (hit) { codeToField[hit.code] = field; wanted.push(hit.code); }
+    // 13561 gir beløp (1000 kr) per regnskapsbegrep — nøkkeltallene beregnes:
+    //   AGD13 Brutto driftsinntekter i alt, AGD23 Netto driftsresultat,
+    //   56 Disposisjonsfond, KG117 Netto lånegjeld, AG11 Frie inntekter,
+    //   AG12 Skatt på inntekt og formue inkl. naturressursskatt
+    const BEGREP = ['AGD13', 'AGD23', '56', 'KG117', 'AG11', 'AG12'];
+    const wanted = BEGREP.filter(c => begrepVar.values.includes(c));
+    if (wanted.length < BEGREP.length) {
+        OUT.notes.push(`13561: mangler begrepskoder ${BEGREP.filter(c => !wanted.includes(c)).join(', ')}`);
     }
-    if (wanted.length === 0) throw new Error('13561: ingen innholdskoder matchet');
+    const konsern = findCode(omfangVar, /konsolider/i, 'Konsolidert regnskap');
+    if (!konsern) throw new Error('13561: fant ikke konsolidert regnskapsomfang');
 
-    // Oslo-probe: finnes en egen region for fylkesdelen av Oslo?
-    const osloRegions = regionVar.valueTexts
-        .map((t, i) => ({ code: regionVar.values[i], text: t }))
-        .filter(r => /oslo/i.test(r.text));
-    OUT.notes.push(`13561 Oslo-regioner: ${osloRegions.map(r => `${r.code}=«${r.text}»`).join(', ') || 'ingen'}`);
-    const utenOslo = findRegionAggregate(regionVar, /landet uten oslo/i);
-
-    const regionCodes = [...Object.values(KOSTRA_4DIGIT), ...(utenOslo ? [utenOslo.code] : [])];
+    // Merk (undersøkt 2026-07): region-dimensjonen har verken egen kode for
+    // fylkesdelen av Oslo eller «landet uten Oslo»-aggregat — 0300 er hele
+    // Oslo kommune. Landssnitt uten Oslo beregnes derfor fra fylkessummene.
     const years = tid.values.filter(y => YEARS.includes(parseInt(y)));
-
     const result = await ssbPost('13561', [
-        { code: regionVar.code, selection: { filter: 'item', values: regionCodes } },
-        { code: contents.code, selection: { filter: 'item', values: wanted } },
+        { code: regionVar.code, selection: { filter: 'item', values: regionVar.values } },
+        { code: begrepVar.code, selection: { filter: 'item', values: wanted } },
+        { code: omfangVar.code, selection: { filter: 'item', values: [konsern.code] } },
+        { code: contents.code, selection: { filter: 'item', values: [contents.values[0]] } },
         { code: tid.code, selection: { filter: 'item', values: years } },
     ]);
-    let n = 0;
+
+    // raw[regionCode][år][begrep] = beløp (1000 kr)
+    const raw = {};
     decodeJsonStat2(result, (coord, val) => {
-        const field = codeToField[coord[contents.code]];
-        if (!field) return;
+        const reg = coord[regionVar.code];
         const year = parseInt(coord[tid.code]);
-        const regCode = coord[regionVar.code];
-        const v = ['nettoDriftsresultat', 'disposisjonsfond'].includes(field) ? val : Math.round(val);
-        if (utenOslo && regCode === utenOslo.code) {
-            (OUT.nationalAvg[field] ??= {})[year] = v;
-        } else if (ID_BY_4DIGIT[regCode]) {
-            setCounty('counties', ID_BY_4DIGIT[regCode], field, year, v);
-        } else return;
-        n++;
+        ((raw[reg] ??= {})[year] ??= {})[coord[begrepVar.code]] = val;
     });
-    if (utenOslo) OUT.nationalAvgScope = 'uten-oslo';
+
+    const round1 = x => Math.round(x * 10) / 10;
+    const deriveFields = (b, pop) => {
+        const out = {};
+        if (b.AGD13 > 0) {
+            out.bruttoDriftsinntekter = Math.round(b.AGD13 / 1000); // mill. kr
+            if (b.AGD23 != null) out.nettoDriftsresultat = round1(b.AGD23 / b.AGD13 * 100);
+            if (b['56'] != null) out.disposisjonsfond = round1(b['56'] / b.AGD13 * 100);
+        }
+        if (pop > 0) {
+            if (b.AG11 != null) out.frieInntekterPerInnb = Math.round(b.AG11 * 1000 / pop);
+            if (b.KG117 != null) out.nettoLanegjeldPerInnb = Math.round(b.KG117 * 1000 / pop);
+            if (b.AG12 != null) out.skatteinntekterPerInnb = Math.round(b.AG12 * 1000 / pop);
+        }
+        return out;
+    };
+
+    let n = 0;
+    const sums = {}; // år → begrep → sum uten Oslo (inkl. sammenslåtte enheter — splittede er null da)
+    for (const [reg, byYear] of Object.entries(raw)) {
+        const id = ID_BY_4DIGIT[reg];
+        for (const [yearStr, b] of Object.entries(byYear)) {
+            const year = parseInt(yearStr);
+            if (reg !== KOSTRA_4DIGIT.oslo) {
+                const s = (sums[year] ??= {});
+                for (const [code, val] of Object.entries(b)) s[code] = (s[code] ?? 0) + val;
+            }
+            if (!id) continue;
+            const pop = OUT.counties[id]?.befolkning?.[year];
+            for (const [field, val] of Object.entries(deriveFields(b, pop))) {
+                setCounty('counties', id, field, year, val);
+                n++;
+            }
+        }
+    }
+
+    // Landssnitt uten Oslo (befolkning: hele landet minus Oslo, fra 11342)
+    for (const [yearStr, b] of Object.entries(sums)) {
+        const year = parseInt(yearStr);
+        const popUO = (OUT.nationalPopulation[year] ?? 0) - (OUT.counties.oslo?.befolkning?.[year] ?? 0);
+        for (const [field, val] of Object.entries(deriveFields(b, popUO))) {
+            if (field === 'bruttoDriftsinntekter') continue; // sum, ikke snitt — ikke relevant som referanselinje
+            (OUT.nationalAvg[field] ??= {})[year] = val;
+        }
+    }
+    OUT.nationalAvgScope = 'uten-oslo';
+    OUT.notes.push('13561: ingen egen region for fylkesdelen av Oslo — 0300 er hele Oslo kommune. Landssnitt uten Oslo er beregnet fra fylkessummer.');
     OUT.tables['13561'].ok = true;
-    console.log(`  ✓ 13561 økonomi: ${n} datapunkter (felter: ${Object.values(codeToField).join(', ')})`);
+    console.log(`  ✓ 13561 økonomi: ${n} datapunkter (begreper: ${wanted.join(', ')})`);
 }
 
 async function fetchAreal() {
@@ -314,9 +351,12 @@ async function fetchVei() {
     const contents = findVariable(meta, /^ContentsCode$/i);
     const tid = findVariable(meta, /^Tid$/i);
 
+    // Eksakte innholdskoder (bekreftet via --probe 2026-07)
     const fieldSpecs = [
-        // fylkesveiKm: riktig innholdskode bekreftes via --probe før mapping aktiveres
-        ['darligDekke', /dårlig.*dekke/i, 'roadQuality'],
+        ['fylkesveiKm', /^KOSfylkesveier0000$/, 'structuralLatest'],
+        ['bruer', /^KOSbruertotalt0000$/, 'structuralLatest'],
+        ['tunnelerKm', /^KOSkmtunneler0000$/, 'structuralLatest'],
+        ['darligDekke', /^KOSandeldaarligd0000$/, 'roadQuality'],
     ];
     const codeToSpec = {};
     const wanted = [];
@@ -327,20 +367,27 @@ async function fetchVei() {
     if (wanted.length === 0) throw new Error('11842: ingen innholdskoder matchet');
     const years = tid.values.filter(y => YEARS.includes(parseInt(y)));
     const lastYear = Math.max(...years.map(Number));
+    const utenOslo = findRegionAggregate(regionVar, /landet uten oslo/i);
 
     const result = await ssbPost('11842', [
-        { code: regionVar.code, selection: { filter: 'item', values: Object.values(KOSTRA_4DIGIT) } },
+        { code: regionVar.code, selection: { filter: 'item', values: [...Object.values(KOSTRA_4DIGIT), ...(utenOslo ? [utenOslo.code] : [])] } },
         { code: contents.code, selection: { filter: 'item', values: wanted } },
         { code: tid.code, selection: { filter: 'item', values: years } },
     ]);
     let n = 0;
     decodeJsonStat2(result, (coord, val) => {
         const spec = codeToSpec[coord[contents.code]];
-        const id = ID_BY_4DIGIT[coord[regionVar.code]];
-        if (!spec || !id) return;
+        if (!spec) return;
+        const regCode = coord[regionVar.code];
         const year = parseInt(coord[tid.code]);
+        if (utenOslo && regCode === utenOslo.code) {
+            if (spec.target === 'roadQuality') { setCounty('roadQuality', '_landssnitt', null, year, val); n++; }
+            return;
+        }
+        const id = ID_BY_4DIGIT[regCode];
+        if (!id) return;
         if (spec.target === 'structuralLatest') {
-            if (year === lastYear) { (OUT.structural[id] ??= {}).fylkesveiKm = Math.round(val); n++; }
+            if (year === lastYear) { (OUT.structural[id] ??= {})[spec.field] = Math.round(val); n++; }
         } else {
             setCounty('roadQuality', id, null, year, val);
             n++;
@@ -357,14 +404,15 @@ async function fetchTannhelseDekning() {
     const contents = findVariable(meta, /^ContentsCode$/i);
     const tid = findVariable(meta, /^Tid$/i);
 
-    // Andel (prosent) undersøkt/behandlet — må matche «andel», ellers får vi antall
-    const andel = findCode(contents, /andel.*(undersøkt|behandlet)/i, 'Andel undersøkt');
+    // «Andel undersøkt/behandlet (prosent)» — eksakt kode bekreftet via --probe
+    const andel = findCode(contents, /^KOSandelundersok0000$/, 'Andel undersøkt');
     if (!andel) throw new Error('11961: fant ikke andel-undersøkt-kode');
+    const utenOslo = findRegionAggregate(regionVar, /landet uten oslo/i);
 
     // Pasientgruppe-dimensjon (barn 3–18 år), hvis den finnes
     const gruppeVar = meta.variables.find(v => /pasient|gruppe/i.test(v.code) || /pasient|gruppe/i.test(v.text));
     const query = [
-        { code: regionVar.code, selection: { filter: 'item', values: Object.values(KOSTRA_4DIGIT) } },
+        { code: regionVar.code, selection: { filter: 'item', values: [...Object.values(KOSTRA_4DIGIT), ...(utenOslo ? [utenOslo.code] : [])] } },
         { code: contents.code, selection: { filter: 'item', values: [andel.code] } },
         { code: tid.code, selection: { filter: 'item', values: tid.values.filter(y => parseInt(y) >= 2020) } },
     ];
@@ -375,7 +423,8 @@ async function fetchTannhelseDekning() {
     const result = await ssbPost('11961', query);
     let n = 0;
     decodeJsonStat2(result, (coord, val) => {
-        const id = ID_BY_4DIGIT[coord[regionVar.code]];
+        const regCode = coord[regionVar.code];
+        const id = (utenOslo && regCode === utenOslo.code) ? '_landssnitt' : ID_BY_4DIGIT[regCode];
         if (!id) return;
         setCounty('dentalCoverage', id, null, parseInt(coord[tid.code]), val);
         n++;
@@ -390,17 +439,21 @@ async function fetchBuss() {
     const regionVar = findVariable(meta, /region/i);
     const contents = findVariable(meta, /^ContentsCode$/i);
     const tid = findVariable(meta, /^Tid$/i);
-    const passasjerer = findCode(contents, /passasjerer/i, 'Passasjerer');
+    // «Passasjerer, buss (antall)» — eksakt kode bekreftet via --probe
+    const passasjerer = findCode(contents, /^KOSpassasjerbuss0000$/, 'Passasjerer buss');
     if (!passasjerer) throw new Error('11844: fant ikke passasjer-kode');
+    // _landssnitt-serien er nasjonal totalsum (inkl. Oslo) → bruk «Landet»
+    const landet = findRegionAggregate(regionVar, /^landet$/i);
 
     const result = await ssbPost('11844', [
-        { code: regionVar.code, selection: { filter: 'item', values: Object.values(KOSTRA_4DIGIT) } },
+        { code: regionVar.code, selection: { filter: 'item', values: [...Object.values(KOSTRA_4DIGIT), ...(landet ? [landet.code] : [])] } },
         { code: contents.code, selection: { filter: 'item', values: [passasjerer.code] } },
         { code: tid.code, selection: { filter: 'item', values: tid.values.filter(y => parseInt(y) >= 2020) } },
     ]);
     let n = 0;
     decodeJsonStat2(result, (coord, val) => {
-        const id = ID_BY_4DIGIT[coord[regionVar.code]];
+        const regCode = coord[regionVar.code];
+        const id = (landet && regCode === landet.code) ? '_landssnitt' : ID_BY_4DIGIT[regCode];
         if (!id) return;
         setCounty('busPassengers', id, null, parseInt(coord[tid.code]), val);
         n++;
@@ -416,33 +469,58 @@ async function fetchVgsGjennomforing() {
     const contents = findVariable(meta, /^ContentsCode$/i);
     const tid = findVariable(meta, /^Tid$/i);
 
-    const andel = findCode(contents, /andel/i, 'Andel');
-    const fullfortVar = meta.variables.find(v => /fullf|gjennomf/i.test(v.code) || /fullf|gjennomf/i.test(v.text));
-    OUT.notes.push(`12971 Tid-koder: ${tid.values.join(', ')}`);
+    // NB (undersøkt 2026-07): region-dimensjonen mangler de nye fylkene fra
+    // 2024 (kun 03, 11, 15, 18, 50 av dagens fylker finnes). Vi henter det som
+    // finnes; øvrige fylker beholder innebygde verdier (estimater).
+    const regionCodes = Object.values(FYLKE_2DIGIT).filter(c => regionVar.values.includes(c));
+    const iAlt = findRegionAggregate(regionVar, /^i alt$/i);
+    const missing = Object.entries(FYLKE_2DIGIT).filter(([, c]) => !regionVar.values.includes(c)).map(([id]) => id);
+    if (missing.length) OUT.notes.push(`12971: mangler regionkoder for ${missing.join(', ')} — beholder innebygde verdier der`);
+
+    const andel = findCode(contents, /^Prosent$|andel/i, 'Andel (prosent)');
+    // «Fullført og bestått innen 5/6 år» = fullført på normert tid + mer enn normert tid
+    const fullfortVar = meta.variables.find(v => /fullf/i.test(v.code) || /fullføringsgrad/i.test(v.text));
+    const bestatt = fullfortVar
+        ? fullfortVar.values.filter((c, i) => /fullført med studie- eller yrkeskompetanse/i.test(fullfortVar.valueTexts[i]))
+        : [];
+    if (!andel || bestatt.length === 0) throw new Error('12971: fant ikke andel-/fullført-koder');
 
     const query = [
-        { code: regionVar.code, selection: { filter: 'item', values: Object.values(FYLKE_2DIGIT) } },
+        { code: regionVar.code, selection: { filter: 'item', values: [...regionCodes, ...(iAlt ? [iAlt.code] : [])] } },
+        { code: fullfortVar.code, selection: { filter: 'item', values: bestatt } },
+        { code: contents.code, selection: { filter: 'item', values: [andel.code] } },
         { code: tid.code, selection: { filter: 'all', values: ['*'] } },
     ];
-    if (andel) query.push({ code: contents.code, selection: { filter: 'item', values: [andel.code] } });
-    if (fullfortVar) {
-        const bestatt = findCode(fullfortVar, /fullført og bestått/i, 'Fullført og bestått');
-        if (bestatt) query.push({ code: fullfortVar.code, selection: { filter: 'item', values: [bestatt.code] } });
+    // Aggregér over utdanningsprogram/kjønn ved å velge totalkategoriene
+    for (const [re, label] of [[/utdprogram|utdanningsprogram/i, /^alle/i], [/^Kjonn$|kjønn/i, /^begge/i]]) {
+        const v = meta.variables.find(x => re.test(x.code) || re.test(x.text));
+        if (v) {
+            const tot = findCode(v, label, `totalkategori ${v.code}`);
+            if (tot) query.push({ code: v.code, selection: { filter: 'item', values: [tot.code] } });
+        }
     }
+
     const result = await ssbPost('12971', query);
-    let n = 0;
+    // Summér de to fullført-kategoriene per region/år
+    const acc = {};
     decodeJsonStat2(result, (coord, val) => {
-        const id = ID_BY_2DIGIT[coord[regionVar.code]];
+        const regCode = coord[regionVar.code];
+        const id = (iAlt && regCode === iAlt.code) ? '_landssnitt' : ID_BY_2DIGIT[regCode];
         if (!id) return;
-        // Tid kan være kullets startår («2019») eller spenn («2019-2025»).
-        // Publiseringsår i barometeret = startår + 5.
+        // Tid er kullets spenn («2019-2025»); barometerets årstall = startår + 5
         const start = parseInt(String(coord[tid.code]).substring(0, 4));
         if (!Number.isFinite(start)) return;
-        setCounty('vgsCompletion', id, null, start + 5, val);
-        n++;
+        const key = `${id}|${start + 5}`;
+        acc[key] = (acc[key] ?? 0) + val;
     });
+    let n = 0;
+    for (const [key, val] of Object.entries(acc)) {
+        const [id, year] = key.split('|');
+        setCounty('vgsCompletion', id, null, parseInt(year), Math.round(val * 10) / 10);
+        n++;
+    }
     OUT.tables['12971'].ok = true;
-    console.log(`  ✓ 12971 VGS gjennomføring: ${n} datapunkter`);
+    console.log(`  ✓ 12971 VGS gjennomføring: ${n} datapunkter (${regionCodes.length} fylker + landssnitt)`);
 }
 
 // ── Probe-modus ───────────────────────────────────────────────────
