@@ -20,8 +20,8 @@
             </div>
             <div class="nav-links">
                 <a href="#" class="nav-link active">Dashboard</a>
-                <a href="#" class="nav-link" onclick="document.getElementById('modal-datagrunnlag').showModal();return false;">Datagrunnlag</a>
-                <a href="#" class="nav-link" onclick="document.getElementById('modal-om').showModal();return false;">Om</a>
+                <button type="button" class="nav-link" onclick="document.getElementById('modal-datagrunnlag').showModal()">Datagrunnlag</button>
+                <button type="button" class="nav-link" onclick="document.getElementById('modal-om').showModal()">Om</button>
             </div>
         </div>
     </nav>
@@ -137,7 +137,7 @@
                     <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
                     Befolkning
                 </h2>
-                <span class="section-source">Kilde: SSB tabell 07459 (verifisert)</span>
+                <span class="section-source">Kilde: SSB tabell 11342 (verifisert)</span>
             </div>
             <div class="card-grid">
                 <div class="card card-wide">
@@ -302,7 +302,7 @@
                     <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
                     Ansatte og organisering
                 </h2>
-                <span class="section-source">Kilde: SSB / KOSTRA</span>
+                <span class="section-source">Estimater (manuelt vedlikeholdt)</span>
             </div>
             <div class="card-grid">
                 <div class="card card-wide">
@@ -387,11 +387,11 @@
                 <h4>Merknader og definisjoner</h4>
                 <p><span class="merger-marker">★</span> <strong>Sammenslåingsperioder:</strong> Følgende fylker var sammenslått i perioden 2018–2023: <em>Vestfold og Telemark</em> (Vestfold + Telemark, 2020–2023, splittet 2024), <em>Viken</em> (Østfold + Akershus + Buskerud, 2020–2023, splittet 2024), <em>Troms og Finnmark</em> (Troms + Finnmark, 2020–2023, splittet 2024) og <em>Trøndelag</em> (Sør- + Nord-Trøndelag, 2018–, ikke splittet). I tillegg ble <em>Agder</em> (2020–), <em>Innlandet</em> (2020–) og <em>Vestland</em> (2020–) opprettet ved sammenslåing. Data for sammenslåingsperioder er markert med avdempet farge i diagrammene og gjelder hele den sammenslåtte enheten.</p>
                 <p><strong>KOSTRA</strong> (KOmmune-STat-RApportering) er et nasjonalt informasjonssystem som gir styringsinformasjon om kommunal og fylkeskommunal virksomhet.</p>
-                <p><strong>Kilder:</strong> Statistisk sentralbyrå (SSB) tabell 07459 (befolkning), 12163 (KOSTRA netto driftsutgifter) og 13561 (finansielle grunnlagsdata). Økonomidata 2020–2025 er verifisert fra SSB. Tall for 2015–2019 er estimater.</p>
+                <p><strong>Kilder:</strong> Statistisk sentralbyrå (SSB) og KOSTRA. Økonomital for 2015–2019 er estimater; 2020–2025 er verifisert fra SSB. Fullstendig oversikt over tabeller, perioder og oppdatering finnes under <a href="#" onclick="document.getElementById('modal-datagrunnlag').showModal();return false;">Datagrunnlag</a>.</p>
             </div>
             <div class="footer-meta">
-                <p>Fylkesbarometeret &copy; 2026 &middot; Sist oppdatert april 2026</p>
-                <p>Data hentet fra SSB, KOSTRA og fylkeskommunenes egne rapporter.</p>
+                <p>Fylkesbarometeret &copy; 2026 &middot; <span id="footer-updated">Sist oppdatert april 2026</span></p>
+                <p>Data hentet fra Statistisk sentralbyrå (SSB) og KOSTRA.</p>
             </div>
         </div>
     </footer>
@@ -405,29 +405,30 @@
         <div class="modal-body">
             <table class="source-table">
                 <thead>
-                    <tr><th>Datakilde</th><th>SSB-tabell</th><th>Beskrivelse</th><th>Periode</th></tr>
+                    <tr><th>Datakilde</th><th>SSB-tabell</th><th>Beskrivelse</th><th>Periode</th><th>Oppdatering</th></tr>
                 </thead>
                 <tbody>
-                    <tr><td>Befolkning</td><td>11342</td><td>Folkemengde per fylkeskommune, totalt</td><td>2015–2025</td></tr>
-                    <tr><td>Netto driftsresultat</td><td>13561</td><td>Konsolidert regnskap fylkeskommuner, % av BDI</td><td>2020–2025</td></tr>
-                    <tr><td>Skatteinntekter</td><td>13561 / AG12</td><td>Skatt på inntekt og formue inkl. naturressursskatt per innb.</td><td>2020–2025</td></tr>
-                    <tr><td>Frie inntekter</td><td>13561</td><td>Skatteinntekter + rammetilskudd per innbygger</td><td>2020–2025</td></tr>
-                    <tr><td>Disposisjonsfond</td><td>13561</td><td>Disposisjonsfond som % av BDI</td><td>2020–2025</td></tr>
-                    <tr><td>Netto lånegjeld</td><td>13561</td><td>Netto lånegjeld per innbygger (kr)</td><td>2020–2025</td></tr>
-                    <tr><td>VGO-utgifter</td><td>12163 / FGF7</td><td>Netto driftsutgifter til videregående opplæring per innb.</td><td>2015–2025</td></tr>
-                    <tr><td>Samferdsel</td><td>12163 / FGF4</td><td>Netto driftsutgifter til samferdsel per innb.</td><td>2015–2025</td></tr>
-                    <tr><td>Tannhelse</td><td>12163 / FGF8</td><td>Netto driftsutgifter til tannhelse per innb.</td><td>2015–2025</td></tr>
-                    <tr><td>Administrasjon</td><td>12163 / FGF1b</td><td>Netto driftsutgifter til administrasjon per innb.</td><td>2015–2025</td></tr>
-                    <tr><td>Kultur</td><td>12163 / FGF3</td><td>Netto driftsutgifter til kultur og bibliotek per innb.</td><td>2015–2025</td></tr>
-                    <tr><td>Areal</td><td>09280</td><td>Landareal per fylkeskommune (km²)</td><td>2025</td></tr>
-                    <tr><td>Fylkesvei</td><td>11842</td><td>Fylkesveier (km), bruer og tunneler</td><td>2025</td></tr>
-                    <tr><td>Vegdekke</td><td>11961</td><td>Andel fylkesvei med dårlig dekke (%)</td><td>2020–2025</td></tr>
-                    <tr><td>Tannhelse dekning</td><td>11844</td><td>Andel barn/unge 3–18 år undersøkt av tannlege (%)</td><td>2020–2024</td></tr>
-                    <tr><td>Kollektivtrafikk</td><td>10260</td><td>Antall busspassasjerer per år</td><td>2020–2025</td></tr>
-                    <tr><td>VGS gjennomføring</td><td>12971</td><td>Andel fullført og bestått VGO innen 5 år (%)</td><td>2018–2024</td></tr>
+                    <tr><td>Befolkning</td><td>11342</td><td>Folkemengde per fylkeskommune, totalt</td><td>2015–2025</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>Netto driftsresultat</td><td>13561</td><td>Konsolidert regnskap fylkeskommuner, % av BDI</td><td>2015–2025 (2015–2019: estimat)</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>Skatteinntekter</td><td>13561 / AG12</td><td>Skatt på inntekt og formue inkl. naturressursskatt per innb.</td><td>2015–2025 (2015–2019: estimat)</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>Frie inntekter</td><td>13561</td><td>Skatteinntekter + rammetilskudd per innbygger</td><td>2015–2025 (2015–2019: estimat)</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>Disposisjonsfond</td><td>13561</td><td>Disposisjonsfond som % av BDI</td><td>2015–2025 (2015–2019: estimat)</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>Netto lånegjeld</td><td>13561</td><td>Netto lånegjeld per innbygger (kr)</td><td>2015–2025 (2015–2019: estimat)</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>VGO-utgifter</td><td>12163 / FGF7</td><td>Netto driftsutgifter til videregående opplæring per innb.</td><td>2015–2025</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>Samferdsel</td><td>12163 / FGF4</td><td>Netto driftsutgifter til samferdsel per innb.</td><td>2015–2025</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>Tannhelse</td><td>12163 / FGF8</td><td>Netto driftsutgifter til tannhelse per innb.</td><td>2015–2025</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>Administrasjon</td><td>12163 / FGF1b</td><td>Netto driftsutgifter til administrasjon per innb.</td><td>2015–2025</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>Kultur</td><td>12163 / FGF3</td><td>Netto driftsutgifter til kultur og bibliotek per innb.</td><td>2015–2025</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>Areal</td><td>09280</td><td>Landareal per fylkeskommune (km²)</td><td>2025</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>Fylkesvei</td><td>11842</td><td>Fylkesveier (km), bruer og tunneler</td><td>2025</td><td>Delvis automatisk</td></tr>
+                    <tr><td>Vegdekke</td><td>11842</td><td>Andel fylkesvei med dårlig dekke (%)</td><td>2020–2025</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>Tannhelse dekning</td><td>11961</td><td>Andel barn/unge 3–18 år undersøkt av tannlege (%)</td><td>2020–2024</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>Kollektivtrafikk</td><td>11844</td><td>Antall busspassasjerer per år</td><td>2020–2025</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>VGS gjennomføring</td><td>12971</td><td>Andel fullført og bestått VGO innen 5 år (%)</td><td>2018–2024</td><td>Automatisk (månedlig)</td></tr>
+                    <tr><td>Årsverk</td><td>—</td><td>Årsverk i fylkeskommunen (estimat, manuelt vedlikeholdt)</td><td>2015–2025 (estimat)</td><td>Statisk</td></tr>
                 </tbody>
             </table>
-            <p class="modal-note">Data hentes fra <strong>Statistisk sentralbyrå (SSB)</strong> og <strong>KOSTRA</strong> (KOmmune-STat-RApportering). Dynamisk oppdatering via «Oppdater fra SSB»-knappen bruker SSBs JSON-stat2 API (maks 40 forespørsler per minutt). Økonomidata for 2015–2019 er estimater basert på historiske trender.</p>
+            <p class="modal-note">Data hentes fra <strong>Statistisk sentralbyrå (SSB)</strong> og <strong>KOSTRA</strong> (KOmmune-STat-RApportering). Tall merket «Automatisk» oppdateres månedlig fra SSBs JSON-stat2 API via GitHub Actions. «Oppdater fra SSB»-knappen henter i tillegg ferske befolknings- og sektortall direkte i nettleseren. Økonomital for 2015–2019 er estimater basert på historiske trender; for Oslo vises økonomiserier kun fra 2020. Landssnitt-linjene for økonomi og sektorutgifter bruker SSBs aggregat «landet uten Oslo» der det er tilgjengelig.</p>
         </div>
     </dialog>
 
@@ -453,9 +454,10 @@
         </div>
     </dialog>
 
-    <script src="data.js?v=13"></script>
-    <script src="api.js?v=13"></script>
-    <script src="charts.js?v=13"></script>
+    <script src="data/ssb-data.js?v=14"></script>
+    <script src="data.js?v=14"></script>
+    <script src="api.js?v=14"></script>
+    <script src="charts.js?v=14"></script>
     <script>
         // E-post obfuskert som char-koder — aldri lesbar som klartekst i HTML-kildekoden
         (function () {

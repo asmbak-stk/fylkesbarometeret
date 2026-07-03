@@ -165,6 +165,10 @@ body {
 }
 
 .nav-link {
+    background: none;
+    border: none;
+    font-family: inherit;
+    cursor: pointer;
     text-decoration: none;
     color: var(--color-text-secondary);
     font-size: 0.87rem;
