@@ -5,6 +5,9 @@ on:
     # 04:23 UTC den 3. hver måned (unngår rush på hele/halve klokkeslett)
     - cron: '23 4 3 * *'
   workflow_dispatch:
+  # Midlertidig under utvikling på feature-grenen (fjernes før merge):
+  push:
+    branches: [claude/data-page-improvements-r5ci5x]
 
 permissions:
   contents: write
