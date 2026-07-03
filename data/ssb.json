@@ -1,5 +1,4 @@
-// Generert av scripts/fetch-ssb.mjs — ikke rediger manuelt.
-window.SSB_DATA = {
+{
  "fetchedAt": "2026-07-03T08:23:58.693Z",
  "source": "Statistisk sentralbyrå (SSB), JSON-stat2 API",
  "generator": "scripts/fetch-ssb.mjs",
@@ -1224,4 +1223,4 @@ window.SSB_DATA = {
   "12971 Tid-koder: 2006-2012, 2007-2013, 2008-2014, 2009-2015, 2010-2016, 2011-2017, 2012-2018, 2013-2019, 2014-2020, 2015-2021, 2016-2022, 2017-2023, 2018-2024, 2019-2025",
   "FEILET: 12971 VGS gjennomføring: POST 12971: HTTP 400 — {\"error\":\"The request for variable 'Region' has an error. Please check your query.\"}"
  ]
-};
+}
