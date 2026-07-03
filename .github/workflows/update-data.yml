@@ -1,0 +1,35 @@
+name: Oppdater data fra SSB
+
+on:
+  schedule:
+    # 04:23 UTC den 3. hver måned (unngår rush på hele/halve klokkeslett)
+    - cron: '23 4 3 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Hent data fra SSB
+        run: node scripts/fetch-ssb.mjs
+
+      - name: Commit og push ved endringer
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "Ingen endringer i data."
+          else
+            git commit -m "Automatisk dataoppdatering fra SSB"
+            git push
+          fi

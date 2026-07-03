@@ -18,7 +18,7 @@ Chart.defaults.elements.bar.borderRadius = 4;
 Chart.defaults.elements.line.tension = 0.3;
 
 const GRID_COLOR = 'rgba(0,0,0,0.05)';
-const LANDSSNITT_STYLE = { label: 'Landssnitt', borderColor: '#94a3b8', borderDash: [4,3], borderWidth: 1.5, pointRadius: 0, fill: false };
+const LANDSSNITT_STYLE = { label: LANDSSNITT_LABEL, borderColor: '#94a3b8', borderDash: [4,3], borderWidth: 1.5, pointRadius: 0, fill: false };
 
 // Sorted county IDs for chip rendering — computed once at load
 const COUNTY_IDS_SORTED = Object.keys(COUNTY_COLORS).sort((a, b) =>
@@ -203,7 +203,7 @@ function updateAllCharts() {
         fill: false,
     });
     ndrDatasets.push({
-        label: 'Landssnitt',
+        label: LANDSSNITT_LABEL,
         data: NATIONAL_AVG.nettoDriftsresultat,
         borderColor: '#94a3b8',
         borderDash: [4, 3],
@@ -253,7 +253,7 @@ function updateAllCharts() {
     destroyChart('disposisjonsfond');
     const dfDatasets = makeLineDatasets('disposisjonsfond');
     dfDatasets.push({
-        label: 'Landssnitt',
+        label: LANDSSNITT_LABEL,
         data: NATIONAL_AVG.disposisjonsfond,
         borderColor: '#94a3b8',
         borderDash: [4, 3],
@@ -714,10 +714,10 @@ function updateHeader() {
     const hasOthers = counties.some(c => !c.isOslo);
     if (hasOslo && hasOthers) {
         osloBanner.style.display = '';
-        document.getElementById('oslo-text').innerHTML = `<strong>Oslo kommune = fylkeskommune:</strong> Oslo er både kommune og fylkeskommune. Økonomi-tallene (driftsinntekter, frie inntekter, lånegjeld, disposisjonsfond, netto driftsresultat) inkluderer <em>alle</em> kommunale tjenester og er derfor ikke direkte sammenlignbare med andre fylkeskommuner. Sektorutgifter per innbygger (VGO, samferdsel, tannhelse) er derimot sammenlignbare.`;
+        document.getElementById('oslo-text').innerHTML = `<strong>Oslo kommune = fylkeskommune:</strong> Oslo er både kommune og fylkeskommune. Økonomi-tallene (driftsinntekter, frie inntekter, lånegjeld, disposisjonsfond, netto driftsresultat) inkluderer <em>alle</em> kommunale tjenester og er derfor ikke direkte sammenlignbare med andre fylkeskommuner. Økonomiserier for Oslo vises kun fra 2020 (pålitelige tall mangler for 2015–2019). Sektorutgifter per innbygger (VGO, samferdsel, tannhelse) er derimot sammenlignbare.`;
     } else if (hasOslo && !hasOthers) {
         osloBanner.style.display = '';
-        document.getElementById('oslo-text').innerHTML = `<strong>Oslo kommune = fylkeskommune:</strong> Oslo er både kommune og fylkeskommune. Økonomi-tallene inkluderer alle kommunale tjenester (skole, helse, sosial, etc.) i tillegg til fylkeskommunale oppgaver, og er derfor betydelig høyere enn for rene fylkeskommuner.`;
+        document.getElementById('oslo-text').innerHTML = `<strong>Oslo kommune = fylkeskommune:</strong> Oslo er både kommune og fylkeskommune. Økonomi-tallene inkluderer alle kommunale tjenester (skole, helse, sosial, etc.) i tillegg til fylkeskommunale oppgaver, og er derfor betydelig høyere enn for rene fylkeskommuner. Økonomiserier for Oslo vises kun fra 2020 (pålitelige tall mangler for 2015–2019).`;
     } else {
         osloBanner.style.display = 'none';
     }

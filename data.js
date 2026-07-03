@@ -1,7 +1,7 @@
 /**
  * Fylkesbarometeret — Alle norske fylkeskommuner
  * Kilder:
- *   SSB tabell 07459 (befolkning) — verifisert
+ *   SSB tabell 11342 (areal og befolkning) — verifisert
  *   SSB tabell 12163 (KOSTRA netto driftsutgifter per sektor) — verifisert
  *   SSB tabell 13561 (finansielle grunnlagsdata, fylkeskommunekonsern) — verifisert 2020-2025
  *
@@ -12,7 +12,7 @@
  *
  * skatteinntekterPerInnb — SSB tabell 13561, kode AG12
  *   («Skatt på inntekt og formue inkludert naturressursskatt»)
- *   2020-2025: Verifisert — totalt per fylke dividert på befolkning fra tabell 07459
+ *   2020-2025: Verifisert — totalt per fylke dividert på befolkning fra tabell 11342
  *   2015-2019: Estimater basert på historisk trend og fylkets inntektsprofil
  *
  * Sammenslåingshistorikk:
@@ -112,7 +112,9 @@ const COUNTIES = {
           sektor:{labels:['Videregående opplæring','Tannhelse','Samferdsel/vei','Administrasjon','Kultur/næring','Annet'],values:[38,4,28,5,8,17]} },
         [647676,658390,666759,673469,681071,693494,697010,699827,709037,717710,724290],
         { vgoPerInnb:[3771,3810,4061,4182,4310,4177,4695,5158,5661,5574,5803], tannhelsePerInnb:[286,278,284,301,315,308,335,352,477,507,445], samferdselPerInnb:[3328,3373,3053,3086,3453,5226,5641,5094,5714,5782,6124], kulturPerInnb:[5,-51,-12,-58,-67,-85,-77,113,-69,-9,-5], adminPerInnb:[124,136,146,157,158,142,147,179,224,218,214] },
-        { bruttoDriftsinntekter:[10500,11000,11500,12000,12600,70274,76977,79696,82717,86639,93357], nettoDriftsresultat:[1.5,1.2,1.0,0.8,0.5,3.7,4.5,5.4,-0.8,-0.9,3.7], frieInntekterPerInnb:[10200,10500,10900,11300,11700,71120,78709,81347,80903,81985,89400], disposisjonsfond:[2.5,2.2,2.0,2.3,1.8,10.0,11.5,15.4,12.8,9.7,10.4], nettoLanegjeldPerInnb:[8500,9000,9500,10000,10500,52839,58194,67334,79353,95717,107900], arsverk:[5200,5350,5500,5650,5800,6000,6100,6200,6400,6600,6700], skatteinntekterPerInnb:[39700,41700,43800,46000,48300,50710,59820,70220,64360,60750,65460] }),
+        // Økonomi 2015-2019: null — estimatene var på fylkes-skala mens verifiserte tall
+        // fra 2020 gjelder kommune+fylke samlet (kunstig hopp i seriene). Oslo-økonomi vises fra 2020.
+        { bruttoDriftsinntekter:[null,null,null,null,null,70274,76977,79696,82717,86639,93357], nettoDriftsresultat:[null,null,null,null,null,3.7,4.5,5.4,-0.8,-0.9,3.7], frieInntekterPerInnb:[null,null,null,null,null,71120,78709,81347,80903,81985,89400], disposisjonsfond:[null,null,null,null,null,10.0,11.5,15.4,12.8,9.7,10.4], nettoLanegjeldPerInnb:[null,null,null,null,null,52839,58194,67334,79353,95717,107900], arsverk:[null,null,null,null,null,6000,6100,6200,6400,6600,6700], skatteinntekterPerInnb:[null,null,null,null,null,50710,59820,70220,64360,60750,65460] }),
 
     buskerud: mkCounty('buskerud','Buskerud','33',
         { codeOld:'06', codeMerged:'30', mergedName:'Viken', mergedPeriod:[2020,2021,2022,2023], municipalities:20, established:'2024-01-01', isMerged:VIKEN_MERGED,
@@ -312,21 +314,21 @@ const NATIONAL_AVG = {
 // Strukturelle forklaringsvariabler (SSB 09280 areal, 11842 veidata, 2025)
 // Forklarer hvorfor utgiftsnivå varierer mellom fylker
 const STRUCTURAL = {
-    vestfold:      { areal: 2092,  fylkesveiKm: 327,  bruer: 1138, tunnelerKm: 2,   fergesamband: 0  },
-    telemark:      { areal: 13832, fylkesveiKm: 631,  bruer: 1910, tunnelerKm: 6,   fergesamband: 0  },
-    ostfold:       { areal: 3728,  fylkesveiKm: 304,  bruer: 1664, tunnelerKm: 4,   fergesamband: 0  },
-    akershus:      { areal: 5473,  fylkesveiKm: 640,  bruer: 2094, tunnelerKm: 4,   fergesamband: 0  },
+    vestfold:      { areal: 2092,  fylkesveiKm: 1138,  bruer: 327, tunnelerKm: 2,   fergesamband: 0  },
+    telemark:      { areal: 13832, fylkesveiKm: 1910,  bruer: 631, tunnelerKm: 6,   fergesamband: 0  },
+    ostfold:       { areal: 3728,  fylkesveiKm: 1664,  bruer: 304, tunnelerKm: 4,   fergesamband: 0  },
+    akershus:      { areal: 5473,  fylkesveiKm: 2094,  bruer: 640, tunnelerKm: 4,   fergesamband: 0  },
     oslo:          { areal: 426,   fylkesveiKm: 0,    bruer: 0,    tunnelerKm: 0,   fergesamband: 0  },
-    buskerud:      { areal: 13567, fylkesveiKm: 484,  bruer: 1751, tunnelerKm: 7,   fergesamband: 0  },
-    rogaland:      { areal: 8572,  fylkesveiKm: 1057, bruer: 2567, tunnelerKm: 50,  fergesamband: 4  },
-    vestland:      { areal: 31967, fylkesveiKm: 2101, bruer: 5493, tunnelerKm: 200, fergesamband: 17 },
-    moreogromsdal: { areal: 13837, fylkesveiKm: 998,  bruer: 3011, tunnelerKm: 95,  fergesamband: 10 },
-    trondelag:     { areal: 39493, fylkesveiKm: 1385, bruer: 6101, tunnelerKm: 34,  fergesamband: 3  },
-    nordland:      { areal: 35757, fylkesveiKm: 840,  bruer: 4064, tunnelerKm: 81,  fergesamband: 16 },
-    troms:         { areal: 25166, fylkesveiKm: 616,  bruer: 2980, tunnelerKm: 52,  fergesamband: 7  },
-    finnmark:      { areal: 45757, fylkesveiKm: 250,  bruer: 1493, tunnelerKm: 8,   fergesamband: 2  },
-    agder:         { areal: 14980, fylkesveiKm: 1231, bruer: 3695, tunnelerKm: 17,  fergesamband: 0  },
-    innlandet:     { areal: 49386, fylkesveiKm: 1273, bruer: 6816, tunnelerKm: 2,   fergesamband: 1  },
+    buskerud:      { areal: 13567, fylkesveiKm: 1751,  bruer: 484, tunnelerKm: 7,   fergesamband: 0  },
+    rogaland:      { areal: 8572,  fylkesveiKm: 2567, bruer: 1057, tunnelerKm: 50,  fergesamband: 4  },
+    vestland:      { areal: 31967, fylkesveiKm: 5493, bruer: 2101, tunnelerKm: 200, fergesamband: 17 },
+    moreogromsdal: { areal: 13837, fylkesveiKm: 3011,  bruer: 998, tunnelerKm: 95,  fergesamband: 10 },
+    trondelag:     { areal: 39493, fylkesveiKm: 6101, bruer: 1385, tunnelerKm: 34,  fergesamband: 3  },
+    nordland:      { areal: 35757, fylkesveiKm: 4064,  bruer: 840, tunnelerKm: 81,  fergesamband: 16 },
+    troms:         { areal: 25166, fylkesveiKm: 2980,  bruer: 616, tunnelerKm: 52,  fergesamband: 7  },
+    finnmark:      { areal: 45757, fylkesveiKm: 1493,  bruer: 250, tunnelerKm: 8,   fergesamband: 2  },
+    agder:         { areal: 14980, fylkesveiKm: 3695, bruer: 1231, tunnelerKm: 17,  fergesamband: 0  },
+    innlandet:     { areal: 49386, fylkesveiKm: 6816, bruer: 1273, tunnelerKm: 2,   fergesamband: 1  },
 };
 
 // Beregnede strukturelle nøkkeltall
@@ -390,3 +392,73 @@ function getBefolkningsvekst(county) {
         return parseFloat((((val - county.befolkning[i - 1]) / county.befolkning[i - 1]) * 100).toFixed(2));
     });
 }
+
+// ══════════════════════════════════════
+// SSB-OVERLEGG
+// data/ssb-data.js genereres månedlig av scripts/fetch-ssb.mjs (GitHub Actions)
+// og legger ferske SSB-tall oppå de innebygde. Innebygde verdier beholdes for
+// år API-et ikke dekker (estimater 2015–2019 og sammenslåingsperioder).
+// ══════════════════════════════════════
+let LANDSSNITT_LABEL = 'Landssnitt';
+let SSB_FETCHED_AT = null;
+
+(function applySsbOverlay() {
+    const d = (typeof SSB_DATA !== 'undefined' && SSB_DATA) ? SSB_DATA : null;
+    if (!d) return;
+    SSB_FETCHED_AT = d.fetchedAt || null;
+
+    const setByYear = (arr, years, yearMap, guard) => {
+        if (!arr || !yearMap) return;
+        for (const [year, val] of Object.entries(yearMap)) {
+            const i = years.indexOf(parseInt(year));
+            if (i < 0) continue;
+            if (guard && guard(i)) continue;
+            arr[i] = val;
+        }
+    };
+
+    // Per-fylke tidsserier (befolkning, sektorutgifter, økonomi)
+    for (const [id, fields] of Object.entries(d.counties || {})) {
+        const c = COUNTIES[id];
+        if (!c) continue;
+        for (const [field, yearMap] of Object.entries(fields)) {
+            const guard = i =>
+                c.isMerged[i] ||                                        // behold sammenslått enhets tall
+                (field === 'befolkning' && !yearMap[YEARS[i]]) ||       // 0/null = region fantes ikke
+                (c.isOslo && OSLO_INCOMPARABLE.includes(field) && YEARS[i] < 2020); // Oslo-økonomi fra 2020
+            setByYear(c[field], YEARS, yearMap, guard);
+        }
+    }
+
+    // Landssnitt (landet uten Oslo der SSB tilbyr det)
+    for (const [field, yearMap] of Object.entries(d.nationalAvg || {})) {
+        setByYear(NATIONAL_AVG[field], YEARS, yearMap);
+    }
+    if (d.nationalAvgScope === 'uten-oslo') LANDSSNITT_LABEL = 'Landssnitt (uten Oslo)';
+
+    // Strukturtall (areal, fylkesvei-km)
+    for (const [id, s] of Object.entries(d.structural || {})) {
+        if (STRUCTURAL[id]) Object.assign(STRUCTURAL[id], s);
+    }
+
+    // Resultatserier
+    const DENTAL_YEARS = [2020, 2021, 2022, 2023, 2024];
+    const overlaySeries = (target, source, years) => {
+        for (const [id, yearMap] of Object.entries(source || {})) {
+            if (target[id]) setByYear(target[id], years, yearMap);
+        }
+    };
+    overlaySeries(ROAD_QUALITY, d.roadQuality, OUTCOME_YEARS);
+    overlaySeries(DENTAL_COVERAGE, d.dentalCoverage, DENTAL_YEARS);
+    overlaySeries(BUS_PASSENGERS, d.busPassengers, OUTCOME_YEARS);
+    overlaySeries(VGS_COMPLETION, d.vgsCompletion, VGS_YEARS);
+
+    // Datadrevet «Sist oppdatert» i footer og status ved oppdater-knappen
+    const el = document.getElementById('footer-updated');
+    if (el && SSB_FETCHED_AT) {
+        const dt = new Date(SSB_FETCHED_AT);
+        el.textContent = 'Sist oppdatert ' +
+            dt.toLocaleDateString('nb-NO', { month: 'long', year: 'numeric' }) +
+            ' (automatisk fra SSB)';
+    }
+})();

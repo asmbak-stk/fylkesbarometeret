@@ -18,7 +18,7 @@ const SSB_CODES = {
         moreogromsdal: '1500', trondelag: '5000', nordland: '1800',
         troms: '5500', finnmark: '5600', agder: '4200', innlandet: '3400',
     },
-    // Table 07459 uses 2-digit codes
+    // Table 11342 uses 2-digit region codes
     population: {
         vestfold: '39', telemark: '40', ostfold: '31', akershus: '32',
         oslo: '03', buskerud: '33', rogaland: '11', vestland: '46',
@@ -63,7 +63,9 @@ function updateFetchUI() {
         status.className = 'refresh-status error';
     } else {
         btn.textContent = '↻ Oppdater fra SSB';
-        status.textContent = 'Statiske data (innebygd)';
+        status.textContent = (typeof SSB_FETCHED_AT !== 'undefined' && SSB_FETCHED_AT)
+            ? 'Grunndata fra SSB (oppdateres månedlig)'
+            : 'Statiske data (innebygd)';
         status.className = 'refresh-status';
     }
 }
