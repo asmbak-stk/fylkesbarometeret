@@ -5,9 +5,6 @@ on:
     # 04:23 UTC den 3. hver måned (unngår rush på hele/halve klokkeslett)
     - cron: '23 4 3 * *'
   workflow_dispatch:
-  # Midlertidig under utvikling på feature-grenen (fjernes før merge):
-  push:
-    branches: [claude/data-page-improvements-r5ci5x]
 
 permissions:
   contents: write
@@ -21,9 +18,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
-      - name: Probe tabellmetadata (midlertidig under utvikling)
-        run: node scripts/fetch-ssb.mjs --probe
 
       - name: Hent data fra SSB
         run: node scripts/fetch-ssb.mjs

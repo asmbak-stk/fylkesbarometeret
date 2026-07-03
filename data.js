@@ -314,21 +314,21 @@ const NATIONAL_AVG = {
 // Strukturelle forklaringsvariabler (SSB 09280 areal, 11842 veidata, 2025)
 // Forklarer hvorfor utgiftsnivå varierer mellom fylker
 const STRUCTURAL = {
-    vestfold:      { areal: 2092,  fylkesveiKm: 327,  bruer: 1138, tunnelerKm: 2,   fergesamband: 0  },
-    telemark:      { areal: 13832, fylkesveiKm: 631,  bruer: 1910, tunnelerKm: 6,   fergesamband: 0  },
-    ostfold:       { areal: 3728,  fylkesveiKm: 304,  bruer: 1664, tunnelerKm: 4,   fergesamband: 0  },
-    akershus:      { areal: 5473,  fylkesveiKm: 640,  bruer: 2094, tunnelerKm: 4,   fergesamband: 0  },
+    vestfold:      { areal: 2092,  fylkesveiKm: 1138,  bruer: 327, tunnelerKm: 2,   fergesamband: 0  },
+    telemark:      { areal: 13832, fylkesveiKm: 1910,  bruer: 631, tunnelerKm: 6,   fergesamband: 0  },
+    ostfold:       { areal: 3728,  fylkesveiKm: 1664,  bruer: 304, tunnelerKm: 4,   fergesamband: 0  },
+    akershus:      { areal: 5473,  fylkesveiKm: 2094,  bruer: 640, tunnelerKm: 4,   fergesamband: 0  },
     oslo:          { areal: 426,   fylkesveiKm: 0,    bruer: 0,    tunnelerKm: 0,   fergesamband: 0  },
-    buskerud:      { areal: 13567, fylkesveiKm: 484,  bruer: 1751, tunnelerKm: 7,   fergesamband: 0  },
-    rogaland:      { areal: 8572,  fylkesveiKm: 1057, bruer: 2567, tunnelerKm: 50,  fergesamband: 4  },
-    vestland:      { areal: 31967, fylkesveiKm: 2101, bruer: 5493, tunnelerKm: 200, fergesamband: 17 },
-    moreogromsdal: { areal: 13837, fylkesveiKm: 998,  bruer: 3011, tunnelerKm: 95,  fergesamband: 10 },
-    trondelag:     { areal: 39493, fylkesveiKm: 1385, bruer: 6101, tunnelerKm: 34,  fergesamband: 3  },
-    nordland:      { areal: 35757, fylkesveiKm: 840,  bruer: 4064, tunnelerKm: 81,  fergesamband: 16 },
-    troms:         { areal: 25166, fylkesveiKm: 616,  bruer: 2980, tunnelerKm: 52,  fergesamband: 7  },
-    finnmark:      { areal: 45757, fylkesveiKm: 250,  bruer: 1493, tunnelerKm: 8,   fergesamband: 2  },
-    agder:         { areal: 14980, fylkesveiKm: 1231, bruer: 3695, tunnelerKm: 17,  fergesamband: 0  },
-    innlandet:     { areal: 49386, fylkesveiKm: 1273, bruer: 6816, tunnelerKm: 2,   fergesamband: 1  },
+    buskerud:      { areal: 13567, fylkesveiKm: 1751,  bruer: 484, tunnelerKm: 7,   fergesamband: 0  },
+    rogaland:      { areal: 8572,  fylkesveiKm: 2567, bruer: 1057, tunnelerKm: 50,  fergesamband: 4  },
+    vestland:      { areal: 31967, fylkesveiKm: 5493, bruer: 2101, tunnelerKm: 200, fergesamband: 17 },
+    moreogromsdal: { areal: 13837, fylkesveiKm: 3011,  bruer: 998, tunnelerKm: 95,  fergesamband: 10 },
+    trondelag:     { areal: 39493, fylkesveiKm: 6101, bruer: 1385, tunnelerKm: 34,  fergesamband: 3  },
+    nordland:      { areal: 35757, fylkesveiKm: 4064,  bruer: 840, tunnelerKm: 81,  fergesamband: 16 },
+    troms:         { areal: 25166, fylkesveiKm: 2980,  bruer: 616, tunnelerKm: 52,  fergesamband: 7  },
+    finnmark:      { areal: 45757, fylkesveiKm: 1493,  bruer: 250, tunnelerKm: 8,   fergesamband: 2  },
+    agder:         { areal: 14980, fylkesveiKm: 3695, bruer: 1231, tunnelerKm: 17,  fergesamband: 0  },
+    innlandet:     { areal: 49386, fylkesveiKm: 6816, bruer: 1273, tunnelerKm: 2,   fergesamband: 1  },
 };
 
 // Beregnede strukturelle nøkkeltall
@@ -461,6 +461,4 @@ let SSB_FETCHED_AT = null;
             dt.toLocaleDateString('nb-NO', { month: 'long', year: 'numeric' }) +
             ' (automatisk fra SSB)';
     }
-    const st = document.getElementById('refresh-status');
-    if (st && SSB_FETCHED_AT) st.textContent = 'Grunndata fra SSB (oppdateres månedlig)';
 })();

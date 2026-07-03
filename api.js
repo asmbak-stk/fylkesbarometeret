@@ -63,7 +63,9 @@ function updateFetchUI() {
         status.className = 'refresh-status error';
     } else {
         btn.textContent = '↻ Oppdater fra SSB';
-        status.textContent = 'Statiske data (innebygd)';
+        status.textContent = (typeof SSB_FETCHED_AT !== 'undefined' && SSB_FETCHED_AT)
+            ? 'Grunndata fra SSB (oppdateres månedlig)'
+            : 'Statiske data (innebygd)';
         status.className = 'refresh-status';
     }
 }
