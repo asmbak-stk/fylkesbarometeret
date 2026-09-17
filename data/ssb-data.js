@@ -1,6 +1,6 @@
 // Generert av scripts/fetch-ssb.mjs — ikke rediger manuelt.
 window.SSB_DATA = {
- "fetchedAt": "2026-09-03T09:00:48.587Z",
+ "fetchedAt": "2026-09-17T12:38:20.526Z",
  "source": "Statistisk sentralbyrå (SSB), JSON-stat2 API",
  "generator": "scripts/fetch-ssb.mjs",
  "tables": {
