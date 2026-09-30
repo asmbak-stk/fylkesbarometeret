@@ -428,7 +428,7 @@
                     <tr><td>Årsverk</td><td>—</td><td>Årsverk i fylkeskommunen (estimat, manuelt vedlikeholdt)</td><td>2015–2025 (estimat)</td><td>Statisk</td></tr>
                 </tbody>
             </table>
-            <p class="modal-note">Data hentes fra <strong>Statistisk sentralbyrå (SSB)</strong> og <strong>KOSTRA</strong> (KOmmune-STat-RApportering). Tall merket «Automatisk» oppdateres månedlig fra SSBs JSON-stat2 API. «Oppdater fra SSB»-knappen henter i tillegg ferske befolknings- og sektortall direkte i nettleseren. Økonomital for 2015–2019 er estimater basert på historiske trender; for Oslo vises økonomiserier kun fra 2020. Landssnitt-linjene for økonomi og sektorutgifter bruker SSBs aggregat «landet uten Oslo» der det er tilgjengelig.</p>
+            <p class="modal-note">Data hentes fra <strong>Statistisk sentralbyrå (SSB)</strong> og <strong>KOSTRA</strong> (KOmmune-STat-RApportering). Tall merket «Automatisk» oppdateres månedlig fra SSBs JSON-stat2 API. «Oppdater fra SSB»-knappen henter alle tabellene på nytt direkte i nettleseren, med den samme koden som den månedlige jobben. De ferske tallene lever bare i fanen din — ved reload er månedstallene tilbake. Økonomital for 2015–2019 er estimater basert på historiske trender; for Oslo vises økonomiserier kun fra 2020. Landssnitt-linjene for økonomi og sektorutgifter bruker SSBs aggregat «landet uten Oslo» der det er tilgjengelig.</p>
         </div>
     </dialog>
 
@@ -454,10 +454,10 @@
         </div>
     </dialog>
 
-    <script src="data/ssb-data.js?v=14"></script>
-    <script src="data.js?v=14"></script>
-    <script src="api.js?v=14"></script>
-    <script src="charts.js?v=14"></script>
+    <script src="data/ssb-data.js?v=15"></script>
+    <script src="data.js?v=15"></script>
+    <script src="api.js?v=15"></script>
+    <script src="charts.js?v=15"></script>
     <script>
         // E-post obfuskert som char-koder — aldri lesbar som klartekst i HTML-kildekoden
         (function () {

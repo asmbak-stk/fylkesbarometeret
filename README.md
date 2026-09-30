@@ -15,7 +15,8 @@ Statisk side (GitHub Pages) — ingen byggverktøy, ingen server. Laget med
 | `charts.js` | Chart.js-rendering, sammenligningstabell, rangering |
 | `data/ssb-data.js` | **Generert** — ferske SSB-tall som `window.SSB_DATA` |
 | `data/ssb.json` | **Generert** — samme innhold som ren JSON (diff-bar rådata) |
-| `scripts/fetch-ssb.mjs` | Henter fra SSB JSON-stat2 API og skriver `data/`-filene |
+| `ssb-tabeller.mjs` | **Felles henting** av de åtte SSB-tabellene — brukes både av skriptet og av «Oppdater fra SSB»-knappen |
+| `scripts/fetch-ssb.mjs` | Node-delen: kjører hentingen og skriver `data/`-filene |
 | `.github/workflows/update-data.yml` | Kjører skriptet på forespørsel (`workflow_dispatch`); den månedlige planen er slått av |
 
 ### Dataflyt
@@ -28,8 +29,9 @@ Statisk side (GitHub Pages) — ingen byggverktøy, ingen server. Laget med
    hver måned, og committer nye datafiler ved endringer. Workflowen her kan
    fortsatt startes manuelt (`workflow_dispatch`), men har ingen tidsplan —
    to automatiske jobber ville gitt hver sin commit på hver sin kopi.
-4. «Oppdater fra SSB»-knappen henter i tillegg befolkning og sektorutgifter
-   direkte i nettleseren (kun i minnet, forsvinner ved reload).
+4. «Oppdater fra SSB»-knappen kjører den samme hentingen i nettleseren — alle
+   åtte tabellene — og legger tallene oppå med `applySsbOverlay()`. Dette skjer
+   kun i minnet og forsvinner ved reload; ingen filer endres.
 
 ## Datakilder (SSB-tabeller)
 

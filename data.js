@@ -395,15 +395,20 @@ function getBefolkningsvekst(county) {
 
 // ══════════════════════════════════════
 // SSB-OVERLEGG
-// data/ssb-data.js genereres månedlig av scripts/fetch-ssb.mjs (GitHub Actions)
-// og legger ferske SSB-tall oppå de innebygde. Innebygde verdier beholdes for
-// år API-et ikke dekker (estimater 2015–2019 og sammenslåingsperioder).
+// data/ssb-data.js genereres månedlig av scripts/fetch-ssb.mjs (cron på
+// hjemmeserveren) og legger ferske SSB-tall oppå de innebygde. Innebygde
+// verdier beholdes for år API-et ikke dekker (estimater 2015–2019 og
+// sammenslåingsperioder).
+//
+// Funksjonen kjøres ved sidelast med de genererte tallene, og på nytt av
+// «Oppdater fra SSB»-knappen med ferske tall hentet i nettleseren. Den
+// skriver til samme plasser hver gang, så den tåler å kalles flere ganger.
 // ══════════════════════════════════════
 let LANDSSNITT_LABEL = 'Landssnitt';
 let SSB_FETCHED_AT = null;
 
-(function applySsbOverlay() {
-    const d = (typeof SSB_DATA !== 'undefined' && SSB_DATA) ? SSB_DATA : null;
+function applySsbOverlay(kilde) {
+    const d = kilde || ((typeof SSB_DATA !== 'undefined' && SSB_DATA) ? SSB_DATA : null);
     if (!d) return;
     SSB_FETCHED_AT = d.fetchedAt || null;
 
@@ -457,8 +462,13 @@ let SSB_FETCHED_AT = null;
     const el = document.getElementById('footer-updated');
     if (el && SSB_FETCHED_AT) {
         const dt = new Date(SSB_FETCHED_AT);
-        el.textContent = 'Sist oppdatert ' +
-            dt.toLocaleDateString('nb-NO', { month: 'long', year: 'numeric' }) +
-            ' (automatisk fra SSB)';
+        el.textContent = kilde
+            ? 'Hentet fra SSB ' + dt.toLocaleString('nb-NO',
+                  { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })
+            : 'Sist oppdatert ' +
+                  dt.toLocaleDateString('nb-NO', { month: 'long', year: 'numeric' }) +
+                  ' (automatisk fra SSB)';
     }
-})();
+}
+
+applySsbOverlay();
