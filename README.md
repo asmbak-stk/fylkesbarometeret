@@ -16,7 +16,7 @@ Statisk side (GitHub Pages) — ingen byggverktøy, ingen server. Laget med
 | `data/ssb-data.js` | **Generert** — ferske SSB-tall som `window.SSB_DATA` |
 | `data/ssb.json` | **Generert** — samme innhold som ren JSON (diff-bar rådata) |
 | `scripts/fetch-ssb.mjs` | Henter fra SSB JSON-stat2 API og skriver `data/`-filene |
-| `.github/workflows/update-data.yml` | Kjører skriptet månedlig og committer endringer |
+| `.github/workflows/update-data.yml` | Kjører skriptet på forespørsel (`workflow_dispatch`); den månedlige planen er slått av |
 
 ### Dataflyt
 
@@ -24,8 +24,10 @@ Statisk side (GitHub Pages) — ingen byggverktøy, ingen server. Laget med
 2. `data/ssb-data.js` lastes først; `data.js` legger disse tallene **oppå** de
    innebygde ved sidelast. Innebygde verdier beholdes for år API-et ikke dekker
    (estimater 2015–2019 og sammenslåingsperioder 2020–2023).
-3. GitHub Actions kjører `scripts/fetch-ssb.mjs` den 3. hver måned (og ved
-   manuell `workflow_dispatch`) og committer nye datafiler ved endringer.
+3. `scripts/fetch-ssb.mjs` kjøres av en cron-jobb på min egen server den 4.
+   hver måned, og committer nye datafiler ved endringer. Workflowen her kan
+   fortsatt startes manuelt (`workflow_dispatch`), men har ingen tidsplan —
+   to automatiske jobber ville gitt hver sin commit på hver sin kopi.
 4. «Oppdater fra SSB»-knappen henter i tillegg befolkning og sektorutgifter
    direkte i nettleseren (kun i minnet, forsvinner ved reload).
 

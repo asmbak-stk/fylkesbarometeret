@@ -1,9 +1,12 @@
 name: Oppdater data fra SSB
 
 on:
-  schedule:
-    # 04:23 UTC den 3. hver måned (unngår rush på hele/halve klokkeslett)
-    - cron: '23 4 3 * *'
+  # Den månedlige oppdateringen kjøres ikke lenger her, men av cron på
+  # hjemmeserveren den 4. hver måned (oppdater_fylkesbarometeret.sh), som også
+  # publiserer asmundbakkevig.no. To automatiske jobber ville gitt hver sin
+  # commit på hver sin kopi, så tidsplanen under er slått av med vilje.
+  #  schedule:
+  #    - cron: '23 4 3 * *'
   workflow_dispatch:
 
 permissions:
